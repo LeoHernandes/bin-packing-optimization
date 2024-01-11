@@ -49,14 +49,48 @@ end
 function main()
     parsed_args = parse_command_line()
 
-    # println(parsed_args["time_limit"])
-    # println(parsed_args["seed"])
+    num_items, bins_capacity, items = get_instances(parsed_args["file_path"])
 
-    num_itens, bins_capacity, itens = get_instances(parsed_args["file_path"])
+    model = Model(GLPK.Optimizer)
 
-    println("Num itens: ", num_itens)
-    println("Bins capacity: ", bins_capacity)
-    println("First five itens weights: ", itens[1:5])
+    # Variables:
+    # A binary matrix with dimensions N x N
+    # representing what bin is picked to store an item.
+    # N is the number of items. 
+    # The rows represents a bin.
+    # The columns represents an item.
+    # 
+    # The worst case is that we need one bin for each item, 
+    # so we allocate space for a N x N matrix.
+    @variable(model, items_storage[1:num_items, 1:num_items], Bin)
+
+    # An auxiliar vector to represent which bins are being used
+    @variable(model, bins_used[1:num_items], Bin)
+
+    # Constraints:
+    # Each item must be store in exactly one bin
+    for item in 1:num_items
+        @constraint(model, sum([items_storage[bin, item] for bin in 1:num_items]) == 1)
+    end
+
+    # The items stored in a bin must not exceed its capacity
+    for bin in 1:num_items
+        @constraint(model, sum([items_storage[bin, item] * items[item] for item in 1:num_items]) <= bins_capacity)
+    end
+
+    # Populate the auxiliar vector
+    for bin in 1:num_items
+        @constraint(model, bins_used[bin] <= sum([items_storage[bin, item] for item in 1:num_items]))
+        for item in 1:num_items
+            @constraint(model, bins_used[bin] >= items_storage[bin, item])
+        end
+    end
+
+    # Objective: Minimize the number of bins used
+    @objective(model, Min, sum(bins_used))
+
+    optimize!(model)
+    @show objective_value(model)
 end
 
 main()
