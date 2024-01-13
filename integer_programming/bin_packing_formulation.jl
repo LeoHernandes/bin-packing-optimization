@@ -1,6 +1,7 @@
 using JuMP
 using GLPK
 using ArgParse
+using Random
 
 function parse_command_line()
     parser = ArgParseSettings()
@@ -53,6 +54,9 @@ function main()
 
     model = Model(GLPK.Optimizer)
 
+    set_optimizer_attribute(model, "TimeLimitSec", parsed_args["time_limit"] * 60)
+    Random.seed!(parsed_args["seed"])
+
     # Variables:
     # A binary matrix with dimensions N x N
     # representing what bin is picked to store an item.
@@ -75,7 +79,7 @@ function main()
 
     # The items stored in a bin must not exceed its capacity
     for bin in 1:num_items
-        @constraint(model, sum([items_storage[bin, item] * items[item] for item in 1:num_items]) <= bins_capacity)
+        @constraint(model, sum([items_storage[bin, item] * items[item] for item in 1:num_items]) <= bins_capacity * bins_used[bin])
     end
 
     # Populate the auxiliar vector
