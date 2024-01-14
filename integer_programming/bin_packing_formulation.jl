@@ -52,9 +52,9 @@ function main()
 
     num_items, bins_capacity, items = get_instances(parsed_args["file_path"])
 
-    model = Model(GLPK.Optimizer)
+    model = Model(optimizer_with_attributes(GLPK.Optimizer, "tm_lim" => (60000 * parsed_args["time_limit"])))
 
-    set_optimizer_attribute(model, "TimeLimitSec", parsed_args["time_limit"] * 60)
+    set_optimizer_attribute(model, "msg_lev", GLPK.GLP_MSG_ALL)
     Random.seed!(parsed_args["seed"])
 
     # Variables:
