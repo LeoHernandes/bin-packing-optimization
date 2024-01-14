@@ -66,9 +66,8 @@ function main()
     println("num_bins: ", num_bins)
     model = Model(GLPK.Optimizer)
 
-   # set_optimizer_attribute(model, "TimeLimitSec", parsed_args["time_limit"] * 60)
-   # Random.seed!(parsed_args["seed"])
-   # set_optimizer_attribute(m, "msg_lev", GLPK.GLP_MSG_ALL)
+    set_optimizer_attribute(model, "msg_lev", GLPK.GLP_MSG_ALL)
+    Random.seed!(parsed_args["seed"])
 
     # Variables:
     # A binary matrix with dimensions N x N
@@ -92,12 +91,11 @@ function main()
 
     # The items stored in a bin must not exceed its capacity
     for bin in 1:num_bins
-        @constraint(model, sum([items_storage[bin, item] * items[item] for item in 1:num_items]) <= bins_capacity * bins_used[bin])
+        @constraint(model, sum([items_storage[bin, item] * items[item] for item in 1:num_items]) <= bins_capacity)
     end
 
     # Populate the auxiliar vector
     for bin in 1:num_bins
-        #@constraint(model, bins_used[bin] <= sum([items_storage[bin, item] for item in 1:num_items]))
         if(bin < num_bins)
             @constraint(model, bins_used[bin+1] <= bins_used[bin]) 
         end
