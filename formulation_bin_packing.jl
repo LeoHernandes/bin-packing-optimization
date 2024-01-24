@@ -117,15 +117,16 @@ function main()
     @objective(model, Min, sum(bins_used))
 
     optimize!(model)
-    println(solution_summary(model))
 
     if termination_status(model) == OPTIMAL
         println("Solution is optimal")
         @show(objective_value(model))
+        println(solution_summary(model))
     elseif termination_status(model) == TIME_LIMIT
         if has_values(model)
             println("Solution is suboptimal due to a time limit, but a primal solution is available")
             @show(objective_value(model))
+            println(solution_summary(model))
         else
             println("The time limit was reached before finding a solution")
         end
