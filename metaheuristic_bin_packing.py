@@ -40,6 +40,13 @@ def main():
     print("Num itens:", num_itens)
     print("Bins capacity:", bins_capacity)
     print("First five itens:", itens[:5])
+    num_bins = 0
+    total_sum = 0
+    for item in itens:
+        total_sum += item
+        if(total_sum > bins_capacity):
+            total_sum = item
+            num_bins +=1
 
 
 main()
