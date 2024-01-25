@@ -1,6 +1,7 @@
 import argparse
-from time import time
-from typing import List, Tuple
+from timeit import default_timer as timer
+from datetime import timedelta
+from typing import List, Tuple, Dict
 
 
 def parse_command_line():
@@ -35,69 +36,159 @@ def get_instances(file_path):
     return num_itens, bins_capacity, itens
 
 
-def get_bin(num_itens):
-    return [0] * num_itens
-
-
-# TODO: mudar essa função para retornar um vetor ao invés de uma matriz
-def get_starting_solution(itens, num_itens, bins_capacity):
+def get_starting_solution(itens: List[int], bins_capacity: int) -> List[int]:
     total_sum = 0
 
+    current_bin = 1
     bins = []
-    bins.append(get_bin(num_itens))
-
-    for i, item in enumerate(itens):
+    for item in itens:
         total_sum += item
         if total_sum > bins_capacity:
             total_sum = item
-            bins.append(get_bin(num_itens))
-        bins[-1][i] = 1
-
+            current_bin += 1
+        bins.append(current_bin)
     return bins
 
 
-class TabooMovement:
-    def __init__(self, current_bin, destination_bin, item_idx):
-        self.current_bin = current_bin
-        self.destination_bin = destination_bin
-        self.item_idx = item_idx
+class TabooList:
+    def __init__(self, num_items: int, taboo_tenure: int):
+        self.list = [0] * num_items
+        self.tenure = taboo_tenure
 
-    def __str__(self):
-        return f"[{self.item_idx}]: {self.current_bin} -> {self.destination_bin}"
+    def ban_item(self, item_index: int, current_iteration: int):
+        self.list[item_index] = current_iteration
 
-
-class TabooState:
-    pass
+    def is_taboo(self, item_index: int, current_iteration: int) -> bool:
+        return current_iteration - self.list[item_index] < self.tenure
 
 
-def find_movements(bins: TabooState, bins_capacity: int) -> List[TabooMovement]:
-    pass
+class TabooBins:
+    def __init__(self, bins: List[int], weights: List[int], bins_capacity: int):
+        self.bins = bins
+        self.weights = weights
+        self.bins_capacity = bins_capacity
+        self.num_bins = self.bins[-1]  # Bins indexes are in order at init
+        self.bins_weight = [0] * self.num_bins
+        self.init_bins_weights()
+
+    def get_num_bins(self):
+        return self.num_bins
+
+    def get_bins(self):
+        return self.bins
+
+    def move(self, movement: Tuple[int, int]):
+        item_idx, destination_bin = movement
+        self.bins[item_idx] = destination_bin
+
+    def init_bins_weights(self):
+        for i in range(len(self.bins)):
+            self.bins_weight[self.bins[i]] += self.weights[i]
+
+    def will_overflow(self, movement: Tuple[int, int]):
+        item_idx, destination_bin = movement
+        return (
+            self.bins_weight[destination_bin] + self.weights[item_idx]
+            > self.bins_capacity
+        )
+
+    def pop_bin(self, bin):
+        for item_index, bin_index in self.bins:
+            if bin_index > bin:
+                self.bins[item_index] -= 1
+        self.bins_weight.pop(bin)
+        self.num_bins -= 1
+
+    def find_movements(self) -> Dict[Tuple[int, int], int]:
+        """
+        Returns a dict of movements that can be made without overflowing the bins
+        The entries are in the format of (item_index, destination_bin) : movement_value
+        """
+        movements = {}
+        for item_idx, item_bin in enumerate(self.get_bins()):
+            for current_bin in range(1, self.get_num_bins() + 1):
+                movement = (item_idx, current_bin)
+                if item_bin != current_bin and not self.bins.will_overflow(movement):
+                    movements[movement] = self.get_movement_value(movement)
+
+        return movements
+
+    def get_movement_value(self, movement: Tuple[int, int]) -> int:
+        pass
+
+
+class TabooSearch:
+    def __init__(
+        self,
+        bins: TabooBins,
+        bins_capacity: int,
+        weights: List[int],
+        taboo_tenure: int,
+        num_iters_no_improve: int,
+    ):
+        self.bins = bins
+        self.bins_capacity = bins_capacity
+        self.best_solution = bins.get_num_bins()
+        self.weights = weights
+        self.num_iters_no_improve = num_iters_no_improve
+        self.taboo_tenure = taboo_tenure
+        self.taboo_list = TabooList(len(weights), taboo_tenure)
+
+    def get_best_movement(self) -> Tuple[Tuple[int, int], int]:
+        movements = self.bins.find_movements()
+        ## TOOD: Se o melhor valor da vizinhança for melhor que self.best_solution -> return movement
+
+        ## TOOD: Senão, tira todos os movementos taboos, self.taboo_list.is_taboo()
+        ## se não sobrou nada, retorna nadan
+        if len(movements) == 0:
+            return None
+        ## TODO: senão retorna o melhor dentre os que sobraram
+        pass
+
+    def run(self):
+        iters_no_improve = 0
+        iterations = 0
+        while iters_no_improve < self.num_iters_no_improve:
+            movement, value = self.bins.get_best_movement()
+            if movement is None:
+                break
+
+            self.bins.move(movement)
+            self.taboo_list.ban_item(movement.item, iterations)
+            if value > self.best_solution:
+                self.best_solution = value
+                iters_no_improve = 0
+            else:
+                iters_no_improve += 1
+
+            iterations += 1
 
 
 """
 TODO: 
-- Fazer a taboo list é um vetor em que cada posição diz a iteração que o item foi mexido, e comparar com o taboo tenure (len = num_itens)
-- Ao invés de utilizar a matriz binária, ser um vetor em que cada posição é a bin que o item está (len = num_itens)
-- Vetor com as capacidades de cada bin (len = num_bins)
-- Todos os itens podem mover para uma bin vazia que sempre existirá, a não ser que ele seja o único item na bin
-- Somente checamos o critério de aspiração por objetivo quando ele for o único item na bin 
+- [x] Fazer a taboo list é um vetor em que cada posição diz a iteração que o item foi mexido, e comparar com o taboo tenure (len = num_itens)
+- [x] Ao invés de utilizar a matriz binária, ser um vetor em que cada posição é a bin que o item está (len = num_itens)
+- [x] Vetor com as capacidades de cada bin (len = num_bins)
+- [ ] Todos os itens podem mover para uma bin vazia que sempre existirá, a não ser que ele seja o único item na bin
+- [ ] Somente checamos o critério de aspiração por objetivo quando ele for o único item na bin 
 """
-
-
-def taboo_search(bins: TabooState, bins_capacity: int) -> int:
-    TABOO_TENURE = len(bins) // 2
-    taboo_list = []
-
-    best_solution = len(bins)
 
 
 def main():
     args = parse_command_line()
-    num_itens, bins_capacity, itens = get_instances(args.file_path)
+    num_items, bins_capacity, items = get_instances(args.file_path)
 
-    bins = get_starting_solution(itens, num_itens, bins_capacity)
+    # Start benchmark:
+    start_time = timer()
+    bins = get_starting_solution(items, bins_capacity)
 
-    best_solution = taboo_search(bins, bins_capacity)
+    taboo_bins = TabooBins(bins, items)
+    taboo_search = TabooSearch(taboo_bins, bins_capacity, items, num_items // 2)
+    number_of_bins = taboo_search.run()
+    end_time = timer()
+
+    print("The best solution found was using " + number_of_bins + " bins!")
+    print("Time elapsed: " + timedelta(seconds=end_time - start_time))
 
 
 main()
