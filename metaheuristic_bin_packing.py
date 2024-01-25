@@ -78,8 +78,13 @@ class TabooBins:
         return self.bins
 
     def move(self, movement: Tuple[int, int]):
+        ## TODO: pop bin if it is empty after movement `pop_bin(bin)`
         item_idx, destination_bin = movement
         self.bins[item_idx] = destination_bin
+        self.bins_weight[self.bins[item_idx]] = -self.weights[item_idx]
+
+        if destination_bin > self.num_bins:
+            self.bins_weight.append(self.weights[item_idx])
 
     def init_bins_weights(self):
         for i in range(len(self.bins)):
@@ -104,6 +109,7 @@ class TabooBins:
         Returns a dict of movements that can be made without overflowing the bins
         The entries are in the format of (item_index, destination_bin) : movement_value
         """
+        # TODO: consider moving item to a new empty bin
         movements = {}
         for item_idx, item_bin in enumerate(self.get_bins()):
             for current_bin in range(1, self.get_num_bins() + 1):
@@ -114,7 +120,19 @@ class TabooBins:
         return movements
 
     def get_movement_value(self, movement: Tuple[int, int]) -> int:
-        pass
+        # If is adding a new bin
+        item_index, destination_bin = movement
+        if destination_bin > self.num_bins:
+            return destination_bin
+
+        # If is Is leaving the bin empty
+        source_bin = self.bins[item_index]
+        source_bin_weight = self.bins_weight[source_bin]
+        if source_bin_weight - self.weights[item_index] == 0:
+            return self.num_bins - 1
+
+        # Else, it remains the same number of bins
+        return self.num_bins
 
 
 class TabooSearch:
