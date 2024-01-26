@@ -1,5 +1,5 @@
 using JuMP
-using GLPK
+using HiGHS
 using ArgParse
 using Random
 
@@ -51,8 +51,7 @@ function get_initial_num_bins(num_itens, bins_capacity, itens)
     """
     Returns the initial number of bins needed to store all the itens.
     """
-
-    small = 0
+    num_bins = 0
     total_sum = 0
     for i in 1:num_itens
         total_sum += itens[i]
@@ -73,21 +72,19 @@ function main()
     num_bins = get_initial_num_bins(num_itens, bins_capacity, itens)
     println("Starting num_bins: ", num_bins)
 
-    # tm_lim is in milliseconds
-    model = Model(optimizer_with_attributes(GLPK.Optimizer, "tm_lim" => (60000 * parsed_args["time_limit"])))
+    model = Model(HiGHS.Optimizer)
 
-    # set_optimizer_attribute(model, "msg_lev", GLPK.GLP_MSG_ALL)
-    Random.seed!(parsed_args["seed"])
+    set_optimizer_attribute(model, "time_limit", 60.0 * parsed_args["time_limit"])
+    set_optimizer_attribute(model, "log_to_console", false)
 
     # Variables:
-    # A binary matrix with dimensions N x N
+    # A binary matrix with dimensions N x M
     # representing what bin is picked to store an item.
     # N is the number of itens. 
+    # M is the number of starting bins that our heuristic found.
     # The rows represents a bin.
     # The columns represents an item.
-    # 
-    # The worst case is that we need one bin for each item, 
-    # so we allocate space for a N x N matrix.
+
     @variable(model, itens_storage[1:num_bins, 1:num_itens], Bin)
 
     # An auxiliar vector to represent which bins are being used
