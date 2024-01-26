@@ -53,14 +53,15 @@ function get_initial_num_bins(num_itens, bins_capacity, itens)
     """
 
     small = 0
+    total_sum = 0
     for i in 1:num_itens
-        if (itens[i] <= bins_capacity / 2)
-            small += 1
+        total_sum += itens[i]
+        if (total_sum > bins_capacity)
+            total_sum = itens[i]
+            num_bins += 1
         end
     end
 
-    small = floor(Int64, small / 2)
-    num_bins = num_itens - small
 
     return num_bins
 end
