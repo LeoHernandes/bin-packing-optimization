@@ -1,0 +1,23 @@
+Starting num_bins: 53
+objective_value(model) = 39.0
+* Solver : HiGHS
+
+* Status
+  Result count       : 1
+  Termination status : OPTIMAL
+  Message from the solver:
+  "kHighsModelStatusOptimal"
+
+* Candidate solution (result #1)
+  Primal status      : FEASIBLE_POINT
+  Dual status        : NO_SOLUTION
+  Objective value    : 3.90000e+01
+  Objective bound    : 3.90000e+01
+  Relative gap       : 0.00000e+00
+
+* Work counters
+  Solve time (sec)   : 9.43473e+02
+  Simplex iterations : 4551338
+  Barrier iterations : -1
+  Node count         : 160195
+

@@ -44,4 +44,10 @@ Em que:
 - `-t` é o tempo máximo de duração da execução em minutos.
 - `file_name` é o nome de algum arquivo de instância do problema contido na pasta `./selected_bpp_instaces`.
 
+Caso queira uma forma automatizada de executar a formulação para várias instâncias com parâmetros recomendados, edite no script em shell `run_formulation.sh` a lista de arquivos de instâncias que deseja usar e então use o comando:
+
+```shell
+./run_formulation.sh
+```
+
 ## Meta-heurística
