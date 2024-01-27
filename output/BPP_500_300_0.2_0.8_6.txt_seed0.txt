@@ -1,0 +1,23 @@
+Starting num_bins: 348
+objective_value(model) = 270.0
+* Solver : HiGHS
+
+* Status
+  Result count       : 1
+  Termination status : TIME_LIMIT
+  Message from the solver:
+  "kHighsModelStatusTimeLimit"
+
+* Candidate solution (result #1)
+  Primal status      : FEASIBLE_POINT
+  Dual status        : NO_SOLUTION
+  Objective value    : 2.70000e+02
+  Objective bound    : 2.49000e+02
+  Relative gap       : 7.77778e-02
+
+* Work counters
+  Solve time (sec)   : 3.60090e+03
+  Simplex iterations : 582730
+  Barrier iterations : -1
+  Node count         : 519
+
