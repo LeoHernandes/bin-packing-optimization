@@ -75,7 +75,7 @@ class TabooBins:
         self.bins = bins
         self.weights = weights
         self.bins_capacity = bins_capacity
-        self.num_bins = self.bins[-1]  # Bins indexes are in order at init
+        self.num_bins = max(bins) + 1
         self.bins_weight = [0] * self.num_bins
         self.init_bins_weights()
 
@@ -210,7 +210,7 @@ class TabooSearch:
                 break
 
             self.bins.move(movement)
-            self.taboo_list.ban_item(movement.item, self.iterations)
+            self.taboo_list.ban_item(movement[0], self.iterations)
             if value > self.best_solution:
                 self.best_solution = value
                 iters_no_improve = 0
@@ -228,7 +228,7 @@ def main():
     start_time = timer()
     bins = get_starting_solution(items, bins_capacity)
 
-    taboo_bins = TabooBins(bins, items)
+    taboo_bins = TabooBins(bins, items, bins_capacity)
     taboo_search = TabooSearch(
         taboo_bins, bins_capacity, items, args.taboo_tenure, args.max_iterations)
     
@@ -237,11 +237,11 @@ def main():
     number_of_bins = taboo_search.run()
     end_time = timer()
 
-    print("Solving problem for " + num_items + " items and bins with capacity of " + bins_capacity + ":")
+    print("Solving problem for " + str(num_items) + " items and bins with capacity of " + str(bins_capacity) + ":")
     print("#################################################################################\n")
-    print("The initial solution was:" + initial_solution + " bins!")
-    print("The best solution found was using " + number_of_bins + " bins!")
-    print("Time elapsed: " + timedelta(seconds=end_time - start_time))
+    print("The initial solution was:" + str(initial_solution) + " bins!")
+    print("The best solution found was using " + str(number_of_bins) + " bins!")
+    print("Time elapsed: " + str(timedelta(seconds=end_time - start_time)))
 
 
 main()
