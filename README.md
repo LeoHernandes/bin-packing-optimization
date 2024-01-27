@@ -14,7 +14,7 @@ Com essa estrutura precisamos garantir que:
 - Toda coluna possua apenas um elemento com valor `1`. Um item está em exatamente 1 caixa sempre.
 - A soma dos valores das linhas cruzados com os pesos dos itens não pode ultrapassar a capacidade dum pacote.
 
-O número de pacotes considerados como utilizáveis é obtido através de uma heurística simples inicial, a qual armazena os items ordenados em ordem descrescente pelo seus pesos em pacotes até que eles estejam cheios. 
+O número de pacotes considerados como utilizáveis é obtido através de uma heurística simples inicial, a qual armazena os items ordenados em ordem decrescente pelo seus pesos em pacotes até que eles estejam cheios. 
 
 Precisamos minimizar a quantidade de pacotes utilizados. Para facilitar esse cálculo, utilizamos um vetor `V` binário de tamanho igual ao número de pacotes considerados inicialmente e que determina se um pacote está sendo usado.
 
