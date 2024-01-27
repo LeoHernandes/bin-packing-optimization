@@ -1,0 +1,11 @@
+ERROR: LoadError: The model was not solved correctly.
+Stacktrace:
+ [1] error(::String) at ./error.jl:33
+ [2] main() at /home/victor/vscode/bin-packing-optimization/formulation_bin_packing.jl:132
+ [3] top-level scope at /home/victor/vscode/bin-packing-optimization/formulation_bin_packing.jl:136
+ [4] include(::Function, ::Module, ::String) at ./Base.jl:380
+ [5] include(::Module, ::String) at ./Base.jl:368
+ [6] exec_options(::Base.JLOptions) at ./client.jl:296
+ [7] _start() at ./client.jl:506
+in expression starting at /home/victor/vscode/bin-packing-optimization/formulation_bin_packing.jl:136
+Starting num_bins: 408
