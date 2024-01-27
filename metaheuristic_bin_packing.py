@@ -9,11 +9,18 @@ def parse_command_line():
     parser.add_argument("-s", "--seed", type=int,
                         default=0, help="Random seed")
     parser.add_argument(
-        "-t",
-        "--time_limit",
-        default=60,
+        "-i",
+        "--max_iterations",
+        default=20,
         type=int,
-        help="Program's time limit of execution in minutes",
+        help="Program's max iterations without improvement on solution",
+    )
+    parser.add_argument(
+        "-t",
+        "--taboo_tenure",
+        default=20,
+        type=int,
+        help="Program's taboo list size",
     )
     parser.add_argument(
         "file_path", help="Path of the txt file containing the instances"
@@ -223,10 +230,16 @@ def main():
 
     taboo_bins = TabooBins(bins, items)
     taboo_search = TabooSearch(
-        taboo_bins, bins_capacity, items, num_items // 2)
+        taboo_bins, bins_capacity, items, args.taboo_tenure, args.max_iterations)
+    
+    initial_solution = taboo_search.best_solution
+
     number_of_bins = taboo_search.run()
     end_time = timer()
 
+    print("Solving problem for " + num_items + " items and bins with capacity of " + bins_capacity + ":")
+    print("#################################################################################\n")
+    print("The initial solution was:" + initial_solution + " bins!")
     print("The best solution found was using " + number_of_bins + " bins!")
     print("Time elapsed: " + timedelta(seconds=end_time - start_time))
 
