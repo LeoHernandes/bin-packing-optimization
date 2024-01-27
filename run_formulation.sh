@@ -17,10 +17,6 @@ for file_name in "${file_list[@]}"; do
         echo "Running formulation with $file_name and seed 0"
         output_file="${output_dir}/${file_name}_seed0.txt"
         julia $formulation_path -s 0 -t 60 "${file_path}/${file_name}" > $output_file 2>&1
-        
-        echo "Running formulation with $file_name and seed 1"
-        output_file="${output_dir}/${file_name}_seed1.txt"
-        julia $formulation_path -s 1 -t 60 "${file_path}/${file_name}" > $output_file 2>&1
     else
         echo "File $file_name not found."
     fi
