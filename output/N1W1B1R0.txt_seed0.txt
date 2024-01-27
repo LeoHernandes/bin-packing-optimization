@@ -1,0 +1,18 @@
+Starting num_bins: 20
+objective_value(model) = 18.0
+* Solver : HiGHS
+
+* Status
+  Termination status : OPTIMAL
+  Primal status      : FEASIBLE_POINT
+  Dual status        : NO_SOLUTION
+  Message from the solver:
+  "kOptimal"
+
+* Candidate solution
+  Objective value      : 18.0
+  Objective bound      : 18.0
+
+* Work counters
+  Solve time (sec)   : 362.55296
+
