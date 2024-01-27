@@ -98,7 +98,7 @@ function main()
 
     # The itens stored in a bin must not exceed its capacity
     for bin in 1:num_bins
-        @constraint(model, sum([itens_storage[bin, item] * itens[item] for item in 1:num_itens]) <= bins_capacity)
+        @constraint(model, sum([itens_storage[bin, item] * itens[item] for item in 1:num_itens]) <= bins_capacity * bins_used[bin])
     end
 
     # Populate the auxiliar vector
@@ -116,20 +116,11 @@ function main()
 
     optimize!(model)
 
-    if termination_status(model) == OPTIMAL
-        println("Solution is optimal")
+    if has_values(model)
         @show(objective_value(model))
         println(solution_summary(model))
-    elseif termination_status(model) == TIME_LIMIT
-        if has_values(model)
-            println("Solution is suboptimal due to a time limit, but a primal solution is available")
-            @show(objective_value(model))
-            println(solution_summary(model))
-        else
-            println("The time limit was reached before finding a solution")
-        end
     else
-        error("The model was not solved correctly.")
+        println("The time limit was reached before finding a solution")
     end
 end
 
