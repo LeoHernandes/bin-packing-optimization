@@ -15,6 +15,8 @@ output_df = pd.DataFrame(
         "initial_solution",
         "best_solution",
         "time",
+        "max_iterations",
+        "taboo_tenure",
     ]
 )
 try:
@@ -31,7 +33,7 @@ try:
             start_time = timer()
             bins = get_starting_solution(items, bins_capacity)
 
-            max_iterations = num_items * 2
+            max_iterations = num_items
             taboo_tenure = num_items // 2
 
             taboo_bins = TabooBins(bins, items, bins_capacity)
@@ -54,6 +56,8 @@ try:
                         initial_solution,
                         number_of_bins,
                         end_time - start_time,
+                        max_iterations,
+                        taboo_tenure,
                     ]
                 ],
                 columns=[
@@ -64,6 +68,8 @@ try:
                     "initial_solution",
                     "best_solution",
                     "time",
+                    "max_iterations",
+                    "taboo_tenure",
                 ],
             )
             output_df = pd.concat([output_df, df], ignore_index=True)
