@@ -1,2 +1,2 @@
-Starting num_bins: 557
+Starting num_bins: 558
 The time limit was reached before finding a solution

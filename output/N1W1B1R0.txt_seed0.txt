@@ -1,4 +1,4 @@
-Starting num_bins: 20
+Starting num_bins: 21
 objective_value(model) = 18.0
 * Solver : HiGHS
 

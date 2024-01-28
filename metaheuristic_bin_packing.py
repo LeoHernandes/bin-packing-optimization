@@ -94,7 +94,7 @@ class TabooBins:
         self.bins[item_idx] = destination_bin
 
         # If the movement created a new bin
-        if destination_bin > self.num_bins:
+        if destination_bin == self.num_bins:
             self.bins_weight.append(self.weights[item_idx])
             self.num_bins += 1
         else:
@@ -136,9 +136,9 @@ class TabooBins:
                     movements[movement] = self.get_movement_value(movement)
 
             # If the current item is not the only one in the bin
-            if self.weights[item_idx] != self.bins_weight[item_bin - 1]:
+            if self.weights[item_idx] != self.bins_weight[item_bin]:
                 # Make possible to move to a new empty bin
-                movement = (item_idx, self.num_bins + 1)
+                movement = (item_idx, self.num_bins)
                 movements[movement] = self.get_movement_value(movement)
 
         return movements
@@ -182,7 +182,7 @@ class TabooSearch:
         movements = self.bins.find_movements()
         # If there is no movements
         if len(movements) == 0:
-            return None
+            return None, None
 
         # If the best solution found in this iteration is the best we've seen so far
         min_value = min(movements.values())
@@ -203,7 +203,7 @@ class TabooSearch:
 
         # If all movements are taboo
         if len(no_taboo_moves) == 0:
-            return None
+            return None, None
 
         # Return the best solution from movements that aren't taboo
         min_value = min(no_taboo_moves.values())
@@ -227,6 +227,9 @@ class TabooSearch:
                 print("Numero de iteracoes: " + str(self.iterations))
                 print("Numero de iteracoes sem melhorar: " + str(iters_no_improve)) 
                 self.best_solution = value
+                print(
+                    f"[{self.best_solution + 1}] - Improvement in {iters_no_improve} iterations!"
+                )
                 iters_no_improve = 0
             else:
                 iters_no_improve += 1
