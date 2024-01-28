@@ -11,14 +11,14 @@ def parse_command_line():
     parser.add_argument(
         "-i",
         "--max_iterations",
-        default=20,
+        default=0,
         type=int,
         help="Program's max iterations without improvement on solution",
     )
     parser.add_argument(
         "-t",
         "--taboo_tenure",
-        default=20,
+        default=0,
         type=int,
         help="Program's taboo list size",
     )
@@ -91,13 +91,15 @@ class TabooBins:
 
         # Change bin and total weights
         self.bins_weight[source_bin] -= self.weights[item_idx]
-        self.bins_weight[destination_bin] += self.weights[item_idx]
         self.bins[item_idx] = destination_bin
 
         # If the movement created a new bin
         if destination_bin > self.num_bins:
             self.bins_weight.append(self.weights[item_idx])
             self.num_bins += 1
+        else:
+            self.bins_weight[destination_bin] += self.weights[item_idx]
+        self.bins[item_idx] = destination_bin
 
         # If the item was the only one in the bin
         if self.bins_weight[source_bin] == 0:
@@ -119,7 +121,6 @@ class TabooBins:
             if bin_index > bin:
                 self.bins[bin_index] -= 1
         self.bins_weight.pop(bin)
-        self.bins.pop(bin)
         self.num_bins -= 1
 
     def find_movements(self) -> Dict[Tuple[int, int], int]:
@@ -222,6 +223,9 @@ class TabooSearch:
             self.bins.move(movement)
             self.taboo_list.ban_item(movement[0], self.iterations)
             if value < self.best_solution:
+                print("New best solution: " + str(value))
+                print("Numero de iteracoes: " + str(self.iterations))
+                print("Numero de iteracoes sem melhorar: " + str(iters_no_improve)) 
                 self.best_solution = value
                 iters_no_improve = 0
             else:
@@ -241,7 +245,10 @@ def main():
     # Start benchmark:
     start_time = timer()
     bins = get_starting_solution(items, bins_capacity)
-
+    if args.max_iterations == 0:
+        args.max_iterations = num_items * 10
+    if args.taboo_tenure == 0:
+        args.taboo_tenure = num_items//2
     taboo_bins = TabooBins(bins, items, bins_capacity)
     taboo_search = TabooSearch(
         taboo_bins, bins_capacity, items, args.taboo_tenure, args.max_iterations
