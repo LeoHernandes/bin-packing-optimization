@@ -7,8 +7,7 @@ from typing import List, Tuple, Dict
 
 def parse_command_line():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--seed", type=int,
-                        default=0, help="Random seed")
+    parser.add_argument("-s", "--seed", type=int, default=0, help="Random seed")
     parser.add_argument(
         "-i",
         "--max_iterations",
@@ -243,9 +242,9 @@ def main():
     start_time = timer()
     bins = get_starting_solution(items, bins_capacity)
     if args.max_iterations == 0:
-        args.max_iterations = num_items * 10
+        args.max_iterations = num_items * 2
     if args.taboo_tenure == 0:
-        args.taboo_tenure = num_items//2
+        args.taboo_tenure = num_items // 2
     taboo_bins = TabooBins(bins, items, bins_capacity)
     taboo_search = TabooSearch(
         taboo_bins, bins_capacity, items, args.taboo_tenure, args.max_iterations
@@ -271,4 +270,5 @@ def main():
     print("Time elapsed: " + str(timedelta(seconds=end_time - start_time)))
 
 
-main()
+if __name__ == "__main__":
+    main()
