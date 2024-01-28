@@ -7,7 +7,8 @@ from typing import List, Tuple, Dict
 
 def parse_command_line():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--seed", type=int, default=0, help="Random seed")
+    parser.add_argument("-s", "--seed", type=int,
+                        default=0, help="Random seed")
     parser.add_argument(
         "-i",
         "--max_iterations",
@@ -99,7 +100,6 @@ class TabooBins:
             self.num_bins += 1
         else:
             self.bins_weight[destination_bin] += self.weights[item_idx]
-        self.bins[item_idx] = destination_bin
 
         # If the item was the only one in the bin
         if self.bins_weight[source_bin] == 0:
@@ -117,9 +117,9 @@ class TabooBins:
         )
 
     def pop_bin(self, bin):
-        for bin_index in range(len(self.bins)):
+        for item_idx, bin_index in enumerate(self.bins):
             if bin_index > bin:
-                self.bins[bin_index] -= 1
+                self.bins[item_idx] -= 1
         self.bins_weight.pop(bin)
         self.num_bins -= 1
 
@@ -147,7 +147,7 @@ class TabooBins:
         # If is adding a new bin
         item_index, destination_bin = movement
         if destination_bin > self.num_bins - 1:
-            return destination_bin
+            return self.num_bins + 1
 
         # If is Is leaving the bin empty
         source_bin = self.bins[item_index]
@@ -223,16 +223,14 @@ class TabooSearch:
             self.bins.move(movement)
             self.taboo_list.ban_item(movement[0], self.iterations)
             if value < self.best_solution:
-                print("New best solution: " + str(value))
-                print("Numero de iteracoes: " + str(self.iterations))
-                print("Numero de iteracoes sem melhorar: " + str(iters_no_improve)) 
                 self.best_solution = value
-                print(
-                    f"[{self.best_solution + 1}] - Improvement in {iters_no_improve} iterations!"
-                )
                 iters_no_improve = 0
             else:
                 iters_no_improve += 1
+
+            print("num_bins: " + str(self.bins.num_bins))
+            print("max: " + str(max(self.bins.bins)))
+            print("len(bins_weight): " + str(len(self.bins.bins_weight)) + "\n")
 
             self.iterations += 1
         return self.best_solution
@@ -258,6 +256,7 @@ def main():
     )
 
     initial_solution = taboo_search.best_solution
+    print(str(initial_solution))
 
     number_of_bins = taboo_search.run()
     end_time = timer()
