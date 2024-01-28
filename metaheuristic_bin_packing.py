@@ -228,10 +228,6 @@ class TabooSearch:
             else:
                 iters_no_improve += 1
 
-            print("num_bins: " + str(self.bins.num_bins))
-            print("max: " + str(max(self.bins.bins)))
-            print("len(bins_weight): " + str(len(self.bins.bins_weight)) + "\n")
-
             self.iterations += 1
         return self.best_solution
 
@@ -256,7 +252,6 @@ def main():
     )
 
     initial_solution = taboo_search.best_solution
-    print(str(initial_solution))
 
     number_of_bins = taboo_search.run()
     end_time = timer()
