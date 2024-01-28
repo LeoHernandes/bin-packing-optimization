@@ -7,8 +7,7 @@ from typing import List, Tuple, Dict
 
 def parse_command_line():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--seed", type=int,
-                        default=0, help="Random seed")
+    parser.add_argument("-s", "--seed", type=int, default=0, help="Random seed")
     parser.add_argument(
         "-i",
         "--max_iterations",
@@ -116,10 +115,11 @@ class TabooBins:
         )
 
     def pop_bin(self, bin):
-        for item_index, bin_index in self.bins:
+        for bin_index in range(len(self.bins)):
             if bin_index > bin:
-                self.bins[item_index] -= 1
+                self.bins[bin_index] -= 1
         self.bins_weight.pop(bin)
+        self.bins.pop(bin)
         self.num_bins -= 1
 
     def find_movements(self) -> Dict[Tuple[int, int], int]:
@@ -166,7 +166,7 @@ class TabooSearch:
         weights: List[int],
         taboo_tenure: int,
         num_iters_no_improve: int,
-        iterations: int = 0
+        iterations: int = 0,
     ):
         self.bins = bins
         self.bins_capacity = bins_capacity
@@ -188,14 +188,16 @@ class TabooSearch:
         if min_value < self.best_solution:
             # Ignore if it's taboo and return it
             movements_of_best_value = [
-                key for key, value in movements.items() if value == min_value]
+                key for key, value in movements.items() if value == min_value
+            ]
             random_index = random.randint(0, len(movements_of_best_value) - 1)
-            return Tuple(movements_of_best_value[random_index], min_value)
+            return movements_of_best_value[random_index], min_value
 
         # Remove taboo movements:
         def filter_taboo(dict_row: Tuple[Tuple[int, int]]):
             ((item_idx, _), _) = dict_row
             return self.taboo_list.is_taboo(item_idx, self.iterations)
+
         no_taboo_moves = dict(filter(filter_taboo, movements.items()))
 
         # If all movements are taboo
@@ -205,9 +207,10 @@ class TabooSearch:
         # Return the best solution from movements that aren't taboo
         min_value = min(no_taboo_moves.values())
         movements_of_best_value = [
-            key for key, value in no_taboo_moves.items() if value == min_value]
+            key for key, value in no_taboo_moves.items() if value == min_value
+        ]
         random_index = random.randint(0, len(movements_of_best_value) - 1)
-        return Tuple(movements_of_best_value[random_index], min_value)
+        return movements_of_best_value[random_index], min_value
 
     def run(self):
         iters_no_improve = 0
@@ -218,13 +221,14 @@ class TabooSearch:
 
             self.bins.move(movement)
             self.taboo_list.ban_item(movement[0], self.iterations)
-            if value > self.best_solution:
+            if value < self.best_solution:
                 self.best_solution = value
                 iters_no_improve = 0
             else:
                 iters_no_improve += 1
 
             self.iterations += 1
+        return self.best_solution
 
 
 def main():
@@ -240,16 +244,24 @@ def main():
 
     taboo_bins = TabooBins(bins, items, bins_capacity)
     taboo_search = TabooSearch(
-        taboo_bins, bins_capacity, items, args.taboo_tenure, args.max_iterations)
+        taboo_bins, bins_capacity, items, args.taboo_tenure, args.max_iterations
+    )
 
     initial_solution = taboo_search.best_solution
 
     number_of_bins = taboo_search.run()
     end_time = timer()
 
-    print("Solving problem for " + str(num_items) +
-          " items and bins with capacity of " + str(bins_capacity) + ":")
-    print("#################################################################################\n")
+    print(
+        "Solving problem for "
+        + str(num_items)
+        + " items and bins with capacity of "
+        + str(bins_capacity)
+        + ":"
+    )
+    print(
+        "#################################################################################\n"
+    )
     print("The initial solution was:" + str(initial_solution) + " bins!")
     print("The best solution found was using " + str(number_of_bins) + " bins!")
     print("Time elapsed: " + str(timedelta(seconds=end_time - start_time)))
