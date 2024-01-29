@@ -51,3 +51,24 @@ Caso queira uma forma automatizada de executar a formulação para várias inst�
 ```
 
 ## Meta-heurística
+
+Representação do problema:
+- Optamos por trabalhar com um vetor b[] de tamanho igual ao número de itens da instância do problema, em que b[i] = k, i representa o índice de um item e k o índice do pacote no qual esse item está armazenado.
+
+Construção da solução inicial:
+- O algoritmo usado para termos uma solução inicial é o mesmo descrito para a formulação inteira em Julia, com a única diferença sendo a estrutura de dados que é construída como saída desse algoritmo: em vez de uma matriz binária, temos um vetor de números inteiros.
+
+Principais estruturas de dados:
+- Construímos classes que representam a lista de movimentos tabu e o vetor de indexação dos itens com seus respectivos métodos de transformação, sendo elas englobadas pela classe que executa a busca em si.
+
+## Execução do código
+
+A meta-heurística foi implementada na linguagem Python apenas com bibliotecas nativas. 
+
+Em que:
+- `-s` é o parâmetro para determinar a seed utilizada..
+- `-i` é o número máximo de iterações que não melhoram a melhor solução.
+- `-t` é o valor do tabu tenure: o número de iterações que um item fica na lista tabu.
+- `file_name` é o nome de algum arquivo de instância do problema contido na pasta `./selected_bpp_instaces`.
+
+Para tanto a formulação inteira quanto a meta-heurística, somente file_name é um parâmetro obrigatório, os outros possuem valores defaults e não precisam ser passados na execução do programa
